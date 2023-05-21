@@ -4,6 +4,8 @@ use thiserror::Error;
 pub enum ConversionError {
     #[error(transparent)]
     IOError(#[from] std::io::Error),
+    #[error("Format not found in graph")]
+    FormatNotFoundError,
 }
 
 pub type ConversionResult<R> = Result<R, ConversionError>;

@@ -2,16 +2,13 @@ use crate::data::{DataSink, DataSource};
 use crate::error::ConversionResult;
 use crate::format::Format;
 use petgraph::graph::NodeIndex;
-use petgraph::visit::Data;
 use petgraph::Graph;
-use phf::phf_map;
 use std::collections::HashMap;
-use std::fmt::format;
-use std::io::{copy, Read, Write};
+use std::io::copy;
 
 /// TODO: the edges should be a struct which contain conversionFn, but also have information about the *quality* of the conversion
 
-pub type ConversionFn<S: DataSource, D: DataSink> = fn(&mut S, &mut D) -> ConversionResult<()>;
+pub type ConversionFn<S, D> = fn(&mut S, &mut D) -> ConversionResult<()>;
 
 pub struct ConversionWeight {
     pub quality: u8,
@@ -36,7 +33,7 @@ pub(super) fn graph<S: DataSource, D: DataSink>() -> (
 ) {
     // TODO: figure out a better way for this type to work
     let mut format_indices = HashMap::new();
-    let mut g = Graph::new();
+    let mut g: Graph<Format, ConversionFn<S, D>> = Graph::new();
 
     let txt = g.add_node(Format::TXT);
     format_indices.insert(Format::TXT, txt);
