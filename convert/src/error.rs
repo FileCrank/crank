@@ -7,7 +7,11 @@ pub enum ConversionError {
     #[error("Format not found in graph")]
     FormatNotFoundError,
     #[error("No path found")]
-    NoPathFoundError,
+    PathNotFoundError,
+    #[error("Empty Path")]
+    EmptyPathError,
+    #[error("No conversion found")]
+    ConversionNotFoundError,
 }
 
 pub type ConversionResult<R> = Result<R, ConversionError>;
