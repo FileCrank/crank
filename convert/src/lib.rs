@@ -44,15 +44,15 @@ pub fn execute_path(
 
         // The destination is the new source, and we need to allocate a new destination - the
         // capacity of the old one is a good starting point
-        let capacity = dest_buf.get_ref().capacity();
+        let curr_capacity = dest_buf.get_ref().capacity();
         dest_buf.set_position(0);
         src_inner = BufReader::new(dest_buf);
         src_buf = &mut src_inner;
-        dest_buf = Cursor::new(Vec::with_capacity(capacity))
+        dest_buf = Cursor::new(Vec::with_capacity(curr_capacity))
     }
 
-    copy(&mut dest_buf, dest)?;
-
+    // TODO: it would be great if this could be expressed more elegantly - if we were smart enough to skip the state management on the last iteration, we could just copy from dest
+    copy(&mut src_buf, dest)?;
     Ok(())
 }
 
