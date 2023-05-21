@@ -6,6 +6,8 @@ pub enum ConversionError {
     IOError(#[from] std::io::Error),
     #[error("Format not found in graph")]
     FormatNotFoundError,
+    #[error("No path found")]
+    NoPathFoundError,
 }
 
 pub type ConversionResult<R> = Result<R, ConversionError>;
