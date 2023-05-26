@@ -1,10 +1,11 @@
 mod conversions;
 pub mod error;
 pub mod format;
+mod graph;
 
-use crate::conversions::{build_graph, ConversionFn};
 use crate::error::{ConversionError, ConversionResult};
 use crate::format::Format;
+use crate::graph::{build_graph, ConversionFn};
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::{Data, IntoEdges};

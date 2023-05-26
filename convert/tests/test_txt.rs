@@ -5,14 +5,14 @@ use std::io::{BufReader, Read};
 use std::str;
 
 #[test]
-fn test_txt_to_rtf() {
-    let mut basic = BufReader::new(File::open("tests/test_files/basic.txt").unwrap());
+fn test_md_to_txt() {
+    let mut basic = BufReader::new(File::open("tests/test_files/basic.md").unwrap());
     let mut dest: Vec<u8> = Vec::new();
 
     convert(
         Opts {
-            source_format: Format::TXT,
-            dest_format: Format::RTF,
+            source_format: Format::MD,
+            dest_format: Format::TXT,
         },
         &mut basic,
         &mut dest,
@@ -20,5 +20,5 @@ fn test_txt_to_rtf() {
     .unwrap();
 
     let dest_str = str::from_utf8(&dest.as_slice()).unwrap();
-    assert_eq!(dest_str, "Hello, world! 🤠")
+    assert_eq!(dest_str, "Markdown\n\nitalic\nbold\ncode")
 }
