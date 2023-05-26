@@ -1,5 +1,5 @@
 use crate::error::ConversionResult;
-use comrak::nodes::{Ast, AstNode, NodeValue};
+use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, ComrakOptions};
 use std::io::{BufRead, Write};
 use std::ops::Deref;
@@ -41,6 +41,12 @@ pub fn md_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionRe
             NodeValue::Text(ref mut text) => {
                 let mut text_bytes = text.as_bytes();
                 sink_ref.write(text_bytes)?;
+            }
+            NodeValue::LineBreak | NodeValue::Paragraph => {
+                sink_ref.write("\n".as_bytes())?;
+            }
+            NodeValue::Code(ref mut cell) => {
+                sink_ref.write(cell.literal.as_bytes())?;
             }
             _ => {}
         };

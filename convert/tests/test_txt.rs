@@ -1,7 +1,7 @@
 use convert::format::Format;
 use convert::{convert, Opts};
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::BufReader;
 use std::str;
 
 #[test]
@@ -20,5 +20,5 @@ fn test_md_to_txt() {
     .unwrap();
 
     let dest_str = str::from_utf8(&dest.as_slice()).unwrap();
-    assert_eq!(dest_str, "Markdown\n\nitalic\nbold\ncode")
+    assert_eq!(dest_str, "Markdown\nitalic\nbold\ncode")
 }
