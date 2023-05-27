@@ -11,8 +11,8 @@ fn test_md_to_txt() {
 
     convert(
         Opts {
-            source_format: Format::MD,
-            dest_format: Format::TXT,
+            source_format: Format::Md,
+            dest_format: Format::Txt,
         },
         &mut basic,
         &mut dest,

@@ -32,11 +32,11 @@ pub(super) fn build_graph() -> (HashMap<Format, NodeIndex>, Graph<Format, Conver
     let mut format_indices = HashMap::new();
     let mut g: Graph<Format, ConversionFn> = Graph::new();
 
-    let txt = g.add_node(Format::TXT);
-    format_indices.insert(Format::TXT, txt);
+    let txt = g.add_node(Format::Txt);
+    format_indices.insert(Format::Txt, txt);
 
-    let md = g.add_node(Format::MD);
-    format_indices.insert(Format::MD, md);
+    let md = g.add_node(Format::Md);
+    format_indices.insert(Format::Md, md);
 
     g.add_edge(md, txt, md_to_txt);
     g.add_edge(txt, md, identity_conversion);
