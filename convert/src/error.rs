@@ -12,6 +12,8 @@ pub enum ConversionError {
     EmptyPathError,
     #[error("No conversion found")]
     ConversionNotFoundError,
+    #[error(transparent)]
+    DocxReaderError(#[from] docx_rs::ReaderError),
 }
 
 pub type ConversionResult<R> = Result<R, ConversionError>;
