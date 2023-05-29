@@ -1,4 +1,5 @@
 use crate::error::ConversionResult;
+use crate::format::{ChunkFn, ConversionFormat, Format};
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, ComrakOptions};
 use std::io::{BufRead, Write};

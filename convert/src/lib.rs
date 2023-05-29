@@ -4,8 +4,7 @@ pub mod format;
 mod graph;
 
 use crate::error::{ConversionError, ConversionResult};
-use crate::format::Format;
-use crate::graph::{build_graph, ConversionFn};
+use crate::format::{build_graph, Conversion, ConversionFn, Format};
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::{Data, IntoEdges};
@@ -18,7 +17,7 @@ pub struct Opts {
 }
 
 pub fn execute_path(
-    graph: &Graph<Format, ConversionFn>,
+    graph: &Graph<&Format, Conversion>,
     path: Vec<NodeIndex>,
     source: &mut dyn BufRead,
     dest: &mut dyn Write,
@@ -41,7 +40,7 @@ pub fn execute_path(
             .ok_or(ConversionError::ConversionNotFoundError)?;
 
         // Actually execute the conversion
-        conversion(src_buf, &mut dest_buf)?;
+        (conversion.executor)(src_buf, &mut dest_buf)?;
 
         // The destination is the new source, and we need to allocate a new destination - the
         // capacity of the old one is a good starting point

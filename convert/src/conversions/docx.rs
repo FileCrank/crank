@@ -1,4 +1,5 @@
 use crate::error::ConversionResult;
+use crate::format::{ChunkFn, ConversionFormat, Format};
 use docx_rs::{read_docx, Docx};
 use std::io::{BufRead, Read, Write};
 
