@@ -60,31 +60,31 @@ impl Hash for Format {
     }
 }
 
-fn initialize_formats<'a>() -> Vec<Format> {
+fn initialize_formats() -> Vec<Format> {
     let mut formats = Vec::new();
 
     // TODO: write a fun lil macro for defining this more succinctly
-    let mut txt_conversions: HashMap<&Format, Conversion> = HashMap::new();
-    let txt_format = Format {
+    let txt_conversions: HashMap<&Format, Conversion> = HashMap::new();
+    let mut txt_format = Format {
         code: "txt",
         conversions: txt_conversions,
     };
     formats.push(txt_format);
 
-    let mut md_conversions: HashMap<&Format, Conversion> = HashMap::new();
-    let md_format = Format {
+    let md_conversions: HashMap<&Format, Conversion> = HashMap::new();
+    let mut md_format = Format {
         code: "md",
         conversions: md_conversions,
     };
 
-    &txt_conversions.insert(
+    txt_format.conversions.insert(
         &md_format,
         Conversion {
             quality: ConversionQuality {},
             executor: identity_conversion,
         },
     );
-    &md_conversions.insert(
+    md_format.conversions.insert(
         &txt_format,
         Conversion {
             quality: ConversionQuality {},
