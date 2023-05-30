@@ -1,15 +1,15 @@
 mod conversions;
 pub mod error;
 pub mod format;
-mod graph;
 
 use crate::error::{ConversionError, ConversionResult};
-use crate::format::{build_graph, Conversion, ConversionFn, Format};
+use crate::format::{build_graph, Conversion, ConversionFn, Format, FORMAT_DATA};
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::{Data, IntoEdges};
 use petgraph::Graph;
 use std::io::{copy, BufRead, BufReader, Cursor, Write};
+use std::ops::Deref;
 
 pub struct Opts {
     pub source_format: Format,
@@ -17,7 +17,7 @@ pub struct Opts {
 }
 
 pub fn execute_path(
-    graph: &Graph<&Format, Conversion>,
+    graph: &Graph<&Format, &Conversion>,
     path: Vec<NodeIndex>,
     source: &mut dyn BufRead,
     dest: &mut dyn Write,
@@ -57,7 +57,7 @@ pub fn execute_path(
 }
 
 pub fn convert(opts: Opts, source: &mut dyn BufRead, dest: &mut dyn Write) -> ConversionResult<()> {
-    let (format_indices, graph) = build_graph();
+    let (format_indices, graph) = FORMAT_DATA.deref();
 
     let source_index = format_indices
         .get(&opts.source_format)

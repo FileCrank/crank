@@ -1,12 +1,14 @@
+use crate::conversions::identity::identity_conversion;
+use crate::conversions::md::md_to_txt;
 use crate::error::ConversionResult;
-use crate::graph::ConversionWeight;
 use lazy_static::lazy_static;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{format, Debug, Formatter, Octal};
 use std::hash::{Hash, Hasher};
 use std::io::{BufRead, Read, Write};
+use std::ops::Deref;
 use std::str::FromStr;
 
 pub type ChunkFn<'a, T> = dyn Fn(&'a T) -> ConversionResult<()>;
@@ -20,15 +22,20 @@ pub trait ConversionFormat {
 
 pub type ConversionFn = fn(&mut dyn BufRead, &mut dyn Write) -> ConversionResult<()>;
 
+#[derive(Debug)]
+pub struct ConversionQuality {}
+
 pub struct Conversion {
     // TODO: this will probably eventually be a struct that has a whole bunch of properties, like streamability, structure, lossiness, etc. For the moment, though, we haven't even implemented a cost function, so it doesn't matter
-    pub quality: u8,
+    pub quality: ConversionQuality,
     pub executor: ConversionFn,
 }
 
 impl Debug for Conversion {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt()
+        f.debug_struct("Conversion")
+            .field("quality", &self.quality)
+            .finish()
     }
 }
 
@@ -53,40 +60,63 @@ impl Hash for Format {
     }
 }
 
-lazy_static! {
+fn initialize_formats<'a>() -> Vec<Format> {
+    let mut formats = Vec::new();
+
     // TODO: write a fun lil macro for defining this more succinctly
-    static ref txt_conversions: HashMap<&'static Format, Conversion> = HashMap::new();
-    pub static ref TXT: Format = Format {
+    let mut txt_conversions: HashMap<&Format, Conversion> = HashMap::new();
+    let txt_format = Format {
         code: "txt",
-        conversions: *txt_conversions
+        conversions: txt_conversions,
     };
-    static ref md_conversions: HashMap<&'static Format, Conversion> = HashMap::new();
-    pub static ref MD: Format = Format {
+    formats.push(txt_format);
+
+    let mut md_conversions: HashMap<&Format, Conversion> = HashMap::new();
+    let md_format = Format {
         code: "md",
-        conversions: *md_conversions
+        conversions: md_conversions,
     };
-    pub static ref FORMATS: Vec<&'static Format> = vec![&TXT.deref()];
+
+    &txt_conversions.insert(
+        &md_format,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: identity_conversion,
+        },
+    );
+    &md_conversions.insert(
+        &txt_format,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: md_to_txt,
+        },
+    );
+
+    formats.push(md_format);
+    formats
 }
 
-pub fn build_graph() -> (
+pub fn build_graph(
+    formats: Vec<Format>,
+) -> (
     HashMap<&'static Format, NodeIndex>,
-    Graph<&'static Format, Conversion>,
+    Graph<&'static Format, &'static Conversion>,
 ) {
     let mut format_indices: HashMap<&'static Format, NodeIndex> = HashMap::new();
-    let mut graph: Graph<&'static Format, Conversion> = Graph::new();
+    let mut graph: Graph<&'static Format, &'static Conversion> = Graph::new();
 
     // We have to do two passes - one to put all the format references as nodes in the graph, and a second to connect them
-    for format in *FORMATS {
+    for format in formats {
         let format_node_index = graph.add_node(&format);
-        format_indices.insert(format, format_node_index);
+        format_indices.insert(&format, format_node_index);
     }
 
-    for src_format in *FORMATS {
+    for src_format in formats {
         for (dest_format, conversion) in src_format.conversions {
             // These calls can only fail if we link a format struct that's not provided in the
             // final vec, and it would be caught immediately by any of the integration tests, so
             // these are safe in practice
-            let source_index = format_indices.get(src_format).expect(&format!(
+            let source_index = format_indices.get(&src_format).expect(&format!(
                 "Format {} missing from FORMATS vec",
                 src_format.code
             ));
@@ -95,9 +125,17 @@ pub fn build_graph() -> (
                 dest_format.code
             ));
 
-            graph.add_edge(*source_index, *dest_index, conversion);
+            graph.add_edge(*source_index, *dest_index, &conversion);
         }
     }
 
     (format_indices, graph)
+}
+
+lazy_static! {
+    pub static ref FORMATS: Vec<Format> = initialize_formats();
+    pub static ref FORMAT_DATA: (
+        HashMap<&'static Format, NodeIndex>,
+        Graph<&'static Format, &'static Conversion>,
+    ) = build_graph(*FORMATS.deref());
 }
