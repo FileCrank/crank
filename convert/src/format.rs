@@ -73,6 +73,7 @@ macro_rules! conversion_format {
 
 pub const TXT: Format = conversion_format!("txt");
 pub const MD: Format = conversion_format!("md");
+pub const DOCX: Format = conversion_format!("docx");
 
 macro_rules! add_node {
     ($format: expr, $graph: expr, $indices: expr) => {{
