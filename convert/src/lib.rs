@@ -56,15 +56,20 @@ pub fn execute_path(
     Ok(())
 }
 
-pub fn convert(opts: Opts, source: &mut dyn BufRead, dest: &mut dyn Write) -> ConversionResult<()> {
+pub fn convert(
+    from: &Format,
+    to: &Format,
+    source: &mut dyn BufRead,
+    dest: &mut dyn Write,
+) -> ConversionResult<()> {
     let (format_indices, graph) = FORMAT_DATA.deref();
 
     let source_index = format_indices
-        .get(&opts.source_format)
+        .get(from)
         .ok_or(ConversionError::FormatNotFoundError)?;
 
     let dest_index = format_indices
-        .get(&opts.dest_format)
+        .get(to)
         .ok_or(ConversionError::FormatNotFoundError)?;
 
     // TODO: edge cost, estimate cost

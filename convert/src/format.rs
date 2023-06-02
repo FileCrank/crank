@@ -78,13 +78,8 @@ macro_rules! add_node {
     ($format: expr, $graph: expr, $indices: expr) => {{
         let node = $graph.add_node($format);
         $indices.insert($format, node);
+        node
     }};
-}
-
-macro_rules! format_node {
-    ($format: expr, $indices: expr) => {
-        *$indices.get($format).expect("Format missing from graph")
-    };
 }
 
 pub fn build_graph() -> (
@@ -94,15 +89,24 @@ pub fn build_graph() -> (
     let mut graph: Graph<&'static Format, Conversion> = Graph::new();
     let mut format_indices: HashMap<&'static Format, NodeIndex> = HashMap::new();
 
-    add_node!(&TXT, graph, format_indices);
-    add_node!(&MD, graph, format_indices);
+    let txt = add_node!(&TXT, graph, format_indices);
+    let md = add_node!(&MD, graph, format_indices);
 
     graph.add_edge(
-        format_node!(&TXT, format_indices),
-        format_node!(&MD, format_indices),
+        txt,
+        md,
         Conversion {
             quality: ConversionQuality {},
             executor: identity_conversion,
+        },
+    );
+
+    graph.add_edge(
+        md,
+        txt,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: md_to_txt,
         },
     );
 

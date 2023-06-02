@@ -27,9 +27,7 @@ where
 
 pub fn parse_md_fn(source: &mut dyn BufRead) -> ConversionResult<()> {
     let arena: Arena<AstNode> = Arena::new();
-    let mut str_buf = String::new();
-    source.read_to_string(&mut str_buf)?;
-    parse_document(&arena, str_buf.as_str(), &ComrakOptions::default());
+    parse_md!(source, arena);
     Ok(())
 }
 
