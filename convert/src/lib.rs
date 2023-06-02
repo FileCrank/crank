@@ -17,7 +17,7 @@ pub struct Opts {
 }
 
 pub fn execute_path(
-    graph: &Graph<&Format, &Conversion>,
+    graph: &Graph<&Format, Conversion>,
     path: Vec<NodeIndex>,
     source: &mut dyn BufRead,
     dest: &mut dyn Write,
