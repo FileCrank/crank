@@ -5,7 +5,7 @@ use lazy_static::lazy_static;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 use std::collections::HashMap;
-use std::fmt::{format, Debug, Display, Formatter, Octal};
+use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
 use std::io::{BufRead, Read, Write};
 use std::ops::Deref;

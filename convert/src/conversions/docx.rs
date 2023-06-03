@@ -1,10 +1,7 @@
 use crate::error::ConversionResult;
-use crate::format::{ChunkFn, ConversionFormat, Format};
 use crate::writers::md::{MarkdownStyingContext, MarkdownWriter};
-use docx_rs::{
-    read_docx, Document, DocumentChild, Docx, Paragraph, ParagraphChild, Run, RunChild, RunProperty,
-};
-use std::io::{BufRead, Read, Write};
+use docx_rs::{read_docx, DocumentChild, Paragraph, ParagraphChild, Run, RunChild, RunProperty};
+use std::io::{BufRead, Write};
 
 fn apply_run_property(ctx: &mut MarkdownStyingContext, property: &RunProperty) {
     if let Some(_) = property.bold {
@@ -119,7 +116,6 @@ pub fn docx_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> Conversion
 #[cfg(test)]
 mod test_docx {
     use crate::conversions::docx::{docx_to_md, docx_to_txt};
-    use crate::{convert, Opts};
     use std::fs::File;
     use std::io::BufReader;
     use std::str;

@@ -40,7 +40,7 @@ impl<'a> MarkdownWriter<'a> {
         str: &str,
     ) -> ConversionResult<()> {
         // TODO: do this in a smarter way
-        let mut styled_str = str;
+        let mut styled_str: String = String::new();
 
         for (style_attr, style_marker) in vec![
             (styling.bold, "**"),
@@ -49,8 +49,11 @@ impl<'a> MarkdownWriter<'a> {
             (styling.code, "`"),
         ] {
             if style_attr {
-                let format_str = format!("{}{}{}", style_marker, styled_str, style_marker);
-                styled_str = format_str.as_str();
+                let mut str_buf = String::new();
+                str_buf.push_str(style_marker);
+                str_buf.push_str(&styled_str);
+                str_buf.push_str(style_marker);
+                styled_str = str_buf;
             }
         }
 
@@ -58,12 +61,12 @@ impl<'a> MarkdownWriter<'a> {
         Ok(())
     }
 
-    pub fn write_line(&self) -> ConversionResult<()> {
+    pub fn write_line(&mut self) -> ConversionResult<()> {
         self.sink.write(b"\n")?;
         Ok(())
     }
 
-    pub fn write_tab(&self) -> ConversionResult<()> {
+    pub fn write_tab(&mut self) -> ConversionResult<()> {
         self.sink.write(b"\t")?;
         Ok(())
     }

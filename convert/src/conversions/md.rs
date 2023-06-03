@@ -1,10 +1,7 @@
 use crate::error::ConversionResult;
-use crate::format::{ChunkFn, ConversionFormat, Format};
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, ComrakOptions};
 use std::io::{BufRead, Write};
-use std::ops::Deref;
-use std::ptr::NonNull;
 
 macro_rules! parse_md {
     ($source: expr, $arena: expr) => {{

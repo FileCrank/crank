@@ -4,10 +4,9 @@ pub mod format;
 pub(crate) mod writers;
 
 use crate::error::{ConversionError, ConversionResult};
-use crate::format::{build_graph, Conversion, ConversionFn, Format, FORMAT_DATA};
+use crate::format::{Conversion, Format, FORMAT_DATA};
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
-use petgraph::visit::{Data, IntoEdges};
 use petgraph::Graph;
 use std::io::{copy, BufRead, BufReader, Cursor, Write};
 use std::ops::Deref;
