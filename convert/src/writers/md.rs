@@ -40,7 +40,7 @@ impl<'a> MarkdownWriter<'a> {
         str: &str,
     ) -> ConversionResult<()> {
         // TODO: do this in a smarter way
-        let mut styled_str: String = String::new();
+        let mut styled_str: String = str.to_string();
 
         for (style_attr, style_marker) in vec![
             (styling.bold, "**"),

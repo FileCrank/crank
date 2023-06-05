@@ -25,7 +25,8 @@ fn run_child_to_md(
     match run_child {
         RunChild::Text(text) => {
             // TODO: handle preserve_space here?
-            writer.write_with_styling(ctx, text.text.as_str())
+            let text_str = text.text.as_str();
+            writer.write_with_styling(ctx, text_str)
         }
         RunChild::Tab(_) => {
             // There are a bunch of different Tab types implemented in docx, but at least for now
@@ -62,9 +63,17 @@ fn paragraph_child_to_md(
     writer: &mut MarkdownWriter,
 ) -> ConversionResult<()> {
     match child {
-        ParagraphChild::Run(run) => run_to_md(ctx, run, writer),
-        _ => todo!("Handle more paragraph children"),
-    }
+        ParagraphChild::Run(run) => run_to_md(ctx, run, writer)?,
+        // Types that come up in documents, but aren't yet handled
+        ParagraphChild::BookmarkStart(_) | ParagraphChild::BookmarkEnd(_) => {}
+        ParagraphChild::Insert(_) => todo!("Handle insert"),
+        ParagraphChild::Delete(_) => todo!("Handle delete"),
+        ParagraphChild::Hyperlink(_) => todo!("Handle hyperlink"),
+        ParagraphChild::CommentStart(_) => todo!("Handle comment start"),
+        ParagraphChild::CommentEnd(_) => todo!("Handle comment end"),
+        ParagraphChild::StructuredDataTag(_) => todo!("Handle structured data tag"),
+    };
+    Ok(())
 }
 
 fn paragraph_to_md(
@@ -88,7 +97,7 @@ fn document_child_to_md(
 ) -> ConversionResult<()> {
     match child {
         DocumentChild::Paragraph(ref par) => paragraph_to_md(ctx, par, writer)?,
-        _ => {}
+        _ => todo!("Impl other document children"),
     };
     Ok(())
 }
