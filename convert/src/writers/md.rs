@@ -27,7 +27,7 @@ impl Default for MarkdownStyingContext {
 }
 
 pub struct MarkdownWriter<'a> {
-    pub sink: &'a mut dyn Write,
+    sink: &'a mut dyn Write,
 }
 impl<'a> MarkdownWriter<'a> {
     pub fn new(sink: &'a mut dyn Write) -> Self {
@@ -68,6 +68,14 @@ impl<'a> MarkdownWriter<'a> {
 
     pub fn write_tab(&mut self) -> ConversionResult<()> {
         self.sink.write(b"\t")?;
+        Ok(())
+    }
+
+    pub fn write_list_item(&mut self, indentation_level: usize) -> ConversionResult<()> {
+        for _ in 1..indentation_level {
+            self.sink.write(b"\t")?;
+        }
+        self.sink.write(b"- ")?;
         Ok(())
     }
 

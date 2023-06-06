@@ -83,6 +83,12 @@ fn paragraph_to_md(
 ) -> ConversionResult<()> {
     apply_run_property(&mut ctx, &paragraph.property.run_property);
 
+    if let Some(numbering_property) = &paragraph.property.numbering_property {
+        if let Some(numbering_level) = &numbering_property.level {
+            writer.write_list_item(numbering_level.val)?;
+        }
+    }
+
     for child in &paragraph.children {
         paragraph_child_to_md(ctx, child, writer)?;
     }
@@ -118,7 +124,15 @@ pub fn docx_to_md(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionR
     Ok(())
 }
 
+fn document_child_to_txt(child: &DocumentChild, sink: &mut dyn Write) {}
+
 pub fn docx_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+    let mut buf: Vec<u8> = Vec::new();
+    source.read_to_end(&mut buf)?;
+    let docx = read_docx(buf.as_slice())?;
+
+    for child in docx.document.children {}
+
     Ok(())
 }
 

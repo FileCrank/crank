@@ -1,3 +1,4 @@
+use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
 use crate::conversions::md::md_to_txt;
 use crate::error::ConversionResult;
@@ -92,6 +93,7 @@ pub fn build_graph() -> (
 
     let txt = add_node!(&TXT, graph, format_indices);
     let md = add_node!(&MD, graph, format_indices);
+    let docx = add_node!(&DOCX, graph, format_indices);
 
     graph.add_edge(
         txt,
@@ -108,6 +110,15 @@ pub fn build_graph() -> (
         Conversion {
             quality: ConversionQuality {},
             executor: md_to_txt,
+        },
+    );
+
+    graph.add_edge(
+        docx,
+        md,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: docx_to_md,
         },
     );
 
