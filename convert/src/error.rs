@@ -14,6 +14,8 @@ pub enum ConversionError {
     ConversionNotFoundError,
     #[error(transparent)]
     DocxReaderError(#[from] docx_rs::ReaderError),
+    #[error(transparent)]
+    ZipError(#[from] zip::result::ZipError),
 }
 
 pub type ConversionResult<R> = Result<R, ConversionError>;

@@ -1,6 +1,7 @@
 use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
 use crate::conversions::md::md_to_txt;
+use crate::conversions::txt::txt_to_docx;
 use crate::error::ConversionResult;
 use lazy_static::lazy_static;
 use petgraph::graph::NodeIndex;
@@ -119,6 +120,15 @@ pub fn build_graph() -> (
         Conversion {
             quality: ConversionQuality {},
             executor: docx_to_md,
+        },
+    );
+
+    graph.add_edge(
+        txt,
+        docx,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: txt_to_docx,
         },
     );
 
