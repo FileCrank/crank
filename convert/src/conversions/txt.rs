@@ -2,7 +2,7 @@ use crate::error::ConversionResult;
 use crate::format::{ChunkFn, ConversionFormat, Format};
 use crate::writers::docx::DocxWriter;
 use docx_rs::{Docx, Paragraph, Run};
-use std::io::{copy, BufRead, Read, Seek, Write};
+use std::io::{copy, BufRead, Cursor, Read, Seek, Write};
 
 /*
 TODO: use this
@@ -22,18 +22,14 @@ impl ConversionFormat for Format::Txt {
         }
     }
 }
-
  */
 
-pub trait WriteSeek: Write + Seek {}
-
-pub fn txt_to_docx(source: &mut dyn BufRead, sink: &mut dyn WriteSeek) -> ConversionResult<()> {
-    // TODO: use DocxWriter
+pub fn txt_to_docx(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+    let mut writer = DocxWriter::new(sink);
     let mut buf = String::new();
     source.read_to_string(&mut buf)?;
-    let document = Docx::new().add_paragraph(Paragraph::new().add_run(Run::new().add_text(buf)));
-    let built_doc = document.build();
-    built_doc.pack(sink)?;
+    writer.write_text(buf);
+    writer.build()?;
 
     Ok(())
 }
