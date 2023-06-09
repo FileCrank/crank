@@ -26,10 +26,11 @@ impl ConversionFormat for Format::Txt {
 
 pub fn txt_to_docx(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
     let mut writer = DocxWriter::new(sink);
+
     let mut buf = String::new();
     source.read_to_string(&mut buf)?;
-    writer.write_text(buf);
-    writer.build()?;
+
+    writer.write_text(buf).build()?;
 
     Ok(())
 }

@@ -5,20 +5,22 @@ use std::io::{Cursor, Seek, Write};
 
 pub struct DocxWriter<'a> {
     sink: &'a mut dyn Write,
-    document: Box<Docx>,
+    pub document: Docx,
 }
 
 impl<'a> DocxWriter<'a> {
     pub fn new(sink: &'a mut dyn Write) -> Self {
         Self {
             sink,
-            document: Box::new(Docx::new()),
+            document: Docx::new(),
         }
     }
 
-    pub fn write_text(&mut self, text: String) {
-        self.document
+    pub fn write_text(mut self, text: String) -> Self {
+        self.document = self
+            .document
             .add_paragraph(Paragraph::new().add_run(Run::new().add_text(text)));
+        self
     }
 
     pub fn build(self) -> ConversionResult<()> {
