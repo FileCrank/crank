@@ -5,7 +5,7 @@ use std::io::{Cursor, Seek, Write};
 
 pub struct DocxWriter<'a> {
     sink: &'a mut dyn Write,
-    pub document: Docx,
+    document: Docx,
 }
 
 impl<'a> DocxWriter<'a> {
