@@ -6,6 +6,7 @@ use crate::error::ConversionResult;
 use lazy_static::lazy_static;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
@@ -41,10 +42,11 @@ impl Debug for Conversion {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Format {
     /// The unique identifier for the format, for ex. "txt"
     pub code: &'static str,
+    pub name: &'static str,
 }
 
 impl PartialEq<Self> for Format {
@@ -68,14 +70,17 @@ impl Display for Format {
 }
 
 macro_rules! conversion_format {
-    ($code: literal) => {
-        Format { code: $code }
+    ($code: literal, $name: literal) => {
+        Format {
+            code: $code,
+            name: $name,
+        }
     };
 }
 
-pub const TXT: Format = conversion_format!("txt");
-pub const MD: Format = conversion_format!("md");
-pub const DOCX: Format = conversion_format!("docx");
+pub const TXT: Format = conversion_format!("txt", "Text");
+pub const MD: Format = conversion_format!("md", "Markdown");
+pub const DOCX: Format = conversion_format!("docx", "Word Document");
 
 macro_rules! add_node {
     ($format: expr, $graph: expr, $indices: expr) => {{
@@ -140,4 +145,5 @@ lazy_static! {
         HashMap<&'static Format, NodeIndex>,
         Graph<&'static Format, Conversion>,
     ) = build_graph();
+    pub static ref FORMATS: Vec<&'static Format> = vec![&TXT, &MD, &DOCX];
 }
