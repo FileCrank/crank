@@ -1,5 +1,5 @@
+use convert::convert;
 use convert::format::{Format, MD, TXT};
-use convert::{convert, Opts};
 use std::fs::File;
 use std::io::BufReader;
 use std::str;

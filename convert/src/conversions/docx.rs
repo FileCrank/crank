@@ -131,6 +131,7 @@ pub fn docx_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> Conversion
     source.read_to_end(&mut buf)?;
     let docx = read_docx(buf.as_slice())?;
 
+    todo!("Finish!");
     for child in docx.document.children {}
 
     Ok(())

@@ -11,11 +11,6 @@ use petgraph::Graph;
 use std::io::{copy, BufRead, BufReader, Cursor, Write};
 use std::ops::Deref;
 
-pub struct Opts {
-    pub source_format: Format,
-    pub dest_format: Format,
-}
-
 pub fn execute_path(
     graph: &Graph<&Format, Conversion>,
     path: Vec<NodeIndex>,
