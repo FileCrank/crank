@@ -124,15 +124,55 @@ pub fn docx_to_md(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionR
     Ok(())
 }
 
-fn document_child_to_txt(child: &DocumentChild, sink: &mut dyn Write) {}
+fn run_to_txt(run: &Run, sink: &mut dyn Write) -> ConversionResult<()> {
+    for child in &run.children {
+        match child {
+            RunChild::Text(text) => {
+                // TODO: handle preserve_space here?
+                sink.write(text.text.as_bytes())?;
+            }
+            RunChild::Tab(_) => {
+                sink.write(b"\t")?;
+            }
+            RunChild::Break(_) => {
+                sink.write(b"\n")?;
+            }
+            _ => {
+                todo!("Handle more RunChild types")
+            }
+        }
+    }
+    Ok(())
+}
+
+fn paragraph_to_txt(paragraph: &Paragraph, sink: &mut dyn Write) -> ConversionResult<()> {
+    for child in &paragraph.children {
+        match child {
+            ParagraphChild::Run(run) => run_to_txt(run, sink)?,
+            _ => {}
+        };
+    }
+    Ok(())
+}
+
+fn document_child_to_txt(child: &DocumentChild, sink: &mut dyn Write) -> ConversionResult<()> {
+    match child {
+        // For converting to plaintext we only care about paragraphs
+        DocumentChild::Paragraph(ref par) => paragraph_to_txt(par, sink)?,
+        _ => {}
+    };
+
+    Ok(())
+}
 
 pub fn docx_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
     let mut buf: Vec<u8> = Vec::new();
     source.read_to_end(&mut buf)?;
     let docx = read_docx(buf.as_slice())?;
 
-    todo!("Finish!");
-    for child in docx.document.children {}
+    for child in docx.document.children {
+        document_child_to_txt(&child, sink)?;
+    }
 
     Ok(())
 }
@@ -162,6 +202,6 @@ mod test_docx {
         let mut dest: Vec<u8> = Vec::new();
         docx_to_txt(&mut basic, &mut dest).unwrap();
         let dest_str = str::from_utf8(&dest.as_slice()).unwrap();
-        assert_eq!(dest_str, "TODO")
+        assert_eq!(dest_str, " Word Doc\nA\nB\nC\nOrdered\nlist")
     }
 }

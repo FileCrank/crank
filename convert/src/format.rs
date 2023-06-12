@@ -10,9 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
-use std::io::{BufRead, Read, Write};
-use std::ops::Deref;
-use std::str::FromStr;
+use std::io::{BufRead, Write};
 
 pub type ChunkFn<'a, T> = dyn Fn(&'a T) -> ConversionResult<()>;
 

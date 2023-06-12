@@ -1,8 +1,6 @@
 use crate::error::ConversionResult;
-use crate::format::{ChunkFn, ConversionFormat, Format};
 use crate::writers::docx::DocxWriter;
-use docx_rs::{Docx, Paragraph, Run};
-use std::io::{copy, BufRead, Cursor, Read, Seek, Write};
+use std::io::{BufRead, Write};
 
 /*
 TODO: use this
@@ -25,7 +23,7 @@ impl ConversionFormat for Format::Txt {
  */
 
 pub fn txt_to_docx(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
-    let mut writer = DocxWriter::new(sink);
+    let writer = DocxWriter::new(sink);
 
     let mut buf = String::new();
     source.read_to_string(&mut buf)?;

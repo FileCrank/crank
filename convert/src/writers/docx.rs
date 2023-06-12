@@ -1,7 +1,6 @@
 use crate::error::ConversionResult;
-use comrak::nodes::NodeValue::Document;
 use docx_rs::{Docx, Paragraph, Run};
-use std::io::{Cursor, Seek, Write};
+use std::io::{Cursor, Write};
 
 pub struct DocxWriter<'a> {
     sink: &'a mut dyn Write,
