@@ -43,27 +43,27 @@ impl Debug for Conversion {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Format {
+pub struct Format<'a> {
     /// The unique identifier for the format, for ex. "txt"
-    pub code: &'static str,
-    pub name: &'static str,
+    pub code: &'a str,
+    pub name: &'a str,
 }
 
-impl PartialEq<Self> for Format {
+impl PartialEq<Self> for Format<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.code == other.code
     }
 }
 
-impl Eq for Format {}
+impl Eq for Format<'_> {}
 
-impl Hash for Format {
+impl Hash for Format<'_> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.code.hash(state)
     }
 }
 
-impl Display for Format {
+impl Display for Format<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.code)
     }
@@ -91,8 +91,8 @@ macro_rules! add_node {
 }
 
 pub fn build_graph() -> (
-    HashMap<&'static Format, NodeIndex>,
-    Graph<&'static Format, Conversion>,
+    HashMap<&'static Format<'static>, NodeIndex>,
+    Graph<&'static Format<'static>, Conversion>,
 ) {
     let mut graph: Graph<&'static Format, Conversion> = Graph::new();
     let mut format_indices: HashMap<&'static Format, NodeIndex> = HashMap::new();
@@ -142,8 +142,8 @@ pub fn build_graph() -> (
 
 lazy_static! {
     pub static ref FORMAT_DATA: (
-        HashMap<&'static Format, NodeIndex>,
-        Graph<&'static Format, Conversion>,
+        HashMap<&'static Format<'static>, NodeIndex>,
+        Graph<&'static Format<'static>, Conversion>,
     ) = build_graph();
-    pub static ref FORMATS: Vec<&'static Format> = vec![&TXT, &MD, &DOCX];
+    pub static ref FORMATS: Vec<&'static Format<'static>> = vec![&TXT, &MD, &DOCX];
 }
