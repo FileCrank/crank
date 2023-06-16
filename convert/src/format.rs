@@ -79,6 +79,8 @@ macro_rules! conversion_format {
 pub const TXT: Format = conversion_format!("txt", "Text");
 pub const MD: Format = conversion_format!("md", "Markdown");
 pub const DOCX: Format = conversion_format!("docx", "Word Document");
+pub const JPG: Format = conversion_format!("jpg", "JPG Image");
+pub const PNG: Format = conversion_format!("png", "PNG Image");
 
 macro_rules! add_node {
     ($format: expr, $graph: expr, $indices: expr) => {{
@@ -95,6 +97,7 @@ pub fn build_graph() -> (
     let mut graph: Graph<&'static Format, Conversion> = Graph::new();
     let mut format_indices: HashMap<&'static Format, NodeIndex> = HashMap::new();
 
+    // Document formats
     let txt = add_node!(&TXT, graph, format_indices);
     let md = add_node!(&MD, graph, format_indices);
     let docx = add_node!(&DOCX, graph, format_indices);
@@ -135,7 +138,11 @@ pub fn build_graph() -> (
         },
     );
 
-    (format_indices, graph)
+    // Image formats
+    let jpg = add_node!(&JPG, graph, format_indices);
+    let png = add_node!(&PNG, graph, format_indices);
+
+    graph.add_edge()(format_indices, graph)
 }
 
 lazy_static! {
