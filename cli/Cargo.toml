@@ -1,0 +1,9 @@
+[package]
+name = "crank"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+clap = { version = "4.3.4", features = ["derive"] }
+convert = { path = "../convert" }

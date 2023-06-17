@@ -1,7 +1,5 @@
 use crate::error::ConversionResult;
 use crate::format::ConversionFn;
-use image::codecs::jpeg::JpegEncoder;
-use image::codecs::png::PngEncoder;
 use image::io::Reader;
 use image::{ImageEncoder, ImageFormat, ImageOutputFormat};
 use std::io::{BufRead, Cursor, Read, Write};
