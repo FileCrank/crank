@@ -1,5 +1,5 @@
 pub mod docx;
 pub mod identity;
-pub mod jpg;
+pub mod img;
 pub mod md;
 pub mod txt;

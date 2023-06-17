@@ -1,5 +1,6 @@
 use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
+use crate::conversions::img::{jpg_to_png, png_to_jpg};
 use crate::conversions::md::md_to_txt;
 use crate::conversions::txt::txt_to_docx;
 use crate::error::ConversionResult;
@@ -11,6 +12,7 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
 use std::io::{BufRead, Write};
+use std::sync::Arc;
 
 pub type ChunkFn<'a, T> = dyn Fn(&'a T) -> ConversionResult<()>;
 
@@ -21,6 +23,7 @@ pub trait ConversionFormat {
     fn read(source: &mut dyn BufRead, recv: &ChunkFn<Self::ChunkType>) -> ConversionResult<()>;
 }
 
+// TODO: I'd like to make this use a Fn trait instead of a fn pointer without breaking everything
 pub type ConversionFn = fn(&mut dyn BufRead, &mut dyn Write) -> ConversionResult<()>;
 
 #[derive(Debug)]
@@ -142,7 +145,25 @@ pub fn build_graph() -> (
     let jpg = add_node!(&JPG, graph, format_indices);
     let png = add_node!(&PNG, graph, format_indices);
 
-    graph.add_edge()(format_indices, graph)
+    graph.add_edge(
+        jpg,
+        png,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: jpg_to_png,
+        },
+    );
+
+    graph.add_edge(
+        png,
+        jpg,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: png_to_jpg,
+        },
+    );
+
+    (format_indices, graph)
 }
 
 lazy_static! {

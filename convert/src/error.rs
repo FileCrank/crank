@@ -17,6 +17,8 @@ pub enum ConversionError {
     DocxReaderError(#[from] docx_rs::ReaderError),
     #[error(transparent)]
     ZipError(#[from] zip::result::ZipError),
+    #[error(transparent)]
+    ImageError(#[from] image::ImageError),
 }
 
 impl Serialize for ConversionError {
