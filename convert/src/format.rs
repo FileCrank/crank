@@ -1,9 +1,11 @@
 use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
-use crate::conversions::img::{jpg_to_png, png_to_jpg};
 use crate::conversions::md::md_to_txt;
 use crate::conversions::txt::txt_to_docx;
 use crate::error::ConversionResult;
+use crate::{for_all_pairs, image_to_image};
+use comrak::nodes::NodeValue::Image;
+use image::ImageFormat;
 use lazy_static::lazy_static;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
@@ -79,18 +81,43 @@ macro_rules! conversion_format {
     };
 }
 
+// Document formats
 pub const TXT: Format = conversion_format!("txt", "Text");
 pub const MD: Format = conversion_format!("md", "Markdown");
 pub const DOCX: Format = conversion_format!("docx", "Word Document");
+
+// Image formats
 pub const JPG: Format = conversion_format!("jpg", "JPG Image");
 pub const PNG: Format = conversion_format!("png", "PNG Image");
+pub const GIF: Format = conversion_format!("gif", "Animated GIF");
+pub const WEBP: Format = conversion_format!("webp", "WebP Image");
+pub const PNM: Format = conversion_format!("pnm", "PNM Image");
+pub const TIFF: Format = conversion_format!("tiff", "TIFF Image");
+pub const TGA: Format = conversion_format!("tga", "TGA Image");
+pub const DDS: Format = conversion_format!("dds", "DDS Image");
+pub const BMP: Format = conversion_format!("bmp", "BMP Image");
+pub const ICO: Format = conversion_format!("ico", "ICO Image");
+pub const HDR: Format = conversion_format!("hdr", "HDR image");
 
 macro_rules! add_node {
-    ($format: expr, $graph: expr, $indices: expr) => {{
+    ($format: expr, $graph: ident, $indices: ident) => {{
         let node = $graph.add_node($format);
         $indices.insert($format, node);
         node
     }};
+}
+
+macro_rules! add_image_conversion {
+    ($graph: ident, $from_format: expr, $to_format: expr) => {
+        $graph.add_edge(
+            $from_format.0,
+            $to_format.0,
+            Conversion {
+                quality: ConversionQuality {},
+                executor: image_to_image!($from_format.1, $to_format.1),
+            },
+        )
+    };
 }
 
 pub fn build_graph() -> (
@@ -142,25 +169,24 @@ pub fn build_graph() -> (
     );
 
     // Image formats
-    let jpg = add_node!(&JPG, graph, format_indices);
-    let png = add_node!(&PNG, graph, format_indices);
+    let jpg = (add_node!(&JPG, graph, format_indices), ImageFormat::Jpeg);
+    let png = (add_node!(&PNG, graph, format_indices), ImageFormat::Png);
+    let gif = (add_node!(&GIF, graph, format_indices), ImageFormat::Gif);
+    let webp = (add_node!(&WEBP, graph, format_indices), ImageFormat::WebP);
+    let pnm = (add_node!(&PNM, graph, format_indices), ImageFormat::Pnm);
+    let tiff = (add_node!(&TIFF, graph, format_indices), ImageFormat::Tiff);
+    let tga = (add_node!(&TGA, graph, format_indices), ImageFormat::Tga);
+    let dds = (add_node!(&DDS, graph, format_indices), ImageFormat::Dds);
+    let bmp = (add_node!(&BMP, graph, format_indices), ImageFormat::Bmp);
+    let ico = (add_node!(&ICO, graph, format_indices), ImageFormat::Ico);
+    let hdr = (add_node!(&HDR, graph, format_indices), ImageFormat::Hdr);
 
-    graph.add_edge(
-        jpg,
-        png,
-        Conversion {
-            quality: ConversionQuality {},
-            executor: Box::new(jpg_to_png),
-        },
-    );
-
-    graph.add_edge(
-        png,
-        jpg,
-        Conversion {
-            quality: ConversionQuality {},
-            executor: Box::new(png_to_jpg),
-        },
+    // This fun little macro figures out all of the combinations of image formats at compile time,
+    // and writes the code to add them all to the graph. Eventually it'd be nice to define the
+    // mappings between our formats and ImageFormat variants inline as well
+    for_all_pairs!(
+        add_image_conversion,
+        graph: jpg png gif webp pnm tiff tga dds bmp ico hdr
     );
 
     (format_indices, graph)
@@ -171,5 +197,4 @@ lazy_static! {
         HashMap<&'static Format<'static>, NodeIndex>,
         Graph<&'static Format<'static>, Conversion>,
     ) = build_graph();
-    pub static ref FORMATS: Vec<&'static Format<'static>> = vec![&TXT, &MD, &DOCX];
 }

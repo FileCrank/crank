@@ -1,6 +1,7 @@
 mod conversions;
 pub mod error;
 pub mod format;
+mod macros;
 pub(crate) mod writers;
 
 use crate::error::{ConversionError, ConversionResult};
