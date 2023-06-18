@@ -23,8 +23,8 @@ pub trait ConversionFormat {
     fn read(source: &mut dyn BufRead, recv: &ChunkFn<Self::ChunkType>) -> ConversionResult<()>;
 }
 
-// TODO: I'd like to make this use a Fn trait instead of a fn pointer without breaking everything
-pub type ConversionFn = fn(&mut dyn BufRead, &mut dyn Write) -> ConversionResult<()>;
+pub type ConversionFn =
+    dyn Fn(&mut dyn BufRead, &mut dyn Write) -> ConversionResult<()> + Send + Sync;
 
 #[derive(Debug)]
 pub struct ConversionQuality {}
@@ -32,7 +32,7 @@ pub struct ConversionQuality {}
 pub struct Conversion {
     // TODO: this will probably eventually be a struct that has a whole bunch of properties, like streamability, structure, lossiness, etc. For the moment, though, we haven't even implemented a cost function, so it doesn't matter
     pub quality: ConversionQuality,
-    pub executor: ConversionFn,
+    pub executor: Box<ConversionFn>,
 }
 
 impl Debug for Conversion {
@@ -110,7 +110,7 @@ pub fn build_graph() -> (
         md,
         Conversion {
             quality: ConversionQuality {},
-            executor: identity_conversion,
+            executor: Box::new(identity_conversion),
         },
     );
 
@@ -119,7 +119,7 @@ pub fn build_graph() -> (
         txt,
         Conversion {
             quality: ConversionQuality {},
-            executor: md_to_txt,
+            executor: Box::new(md_to_txt),
         },
     );
 
@@ -128,7 +128,7 @@ pub fn build_graph() -> (
         md,
         Conversion {
             quality: ConversionQuality {},
-            executor: docx_to_md,
+            executor: Box::new(docx_to_md),
         },
     );
 
@@ -137,7 +137,7 @@ pub fn build_graph() -> (
         docx,
         Conversion {
             quality: ConversionQuality {},
-            executor: txt_to_docx,
+            executor: Box::new(txt_to_docx),
         },
     );
 
@@ -150,7 +150,7 @@ pub fn build_graph() -> (
         png,
         Conversion {
             quality: ConversionQuality {},
-            executor: jpg_to_png,
+            executor: Box::new(jpg_to_png),
         },
     );
 
@@ -159,7 +159,7 @@ pub fn build_graph() -> (
         jpg,
         Conversion {
             quality: ConversionQuality {},
-            executor: png_to_jpg,
+            executor: Box::new(png_to_jpg),
         },
     );
 
