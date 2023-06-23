@@ -197,4 +197,11 @@ lazy_static! {
         HashMap<&'static Format<'static>, NodeIndex>,
         Graph<&'static Format<'static>, Conversion>,
     ) = build_graph();
+    pub static ref FORMATS_BY_CODE: HashMap<&'static str, &'static Format<'static>> = {
+        let mut map: HashMap<&'static str, &'static Format<'static>> = HashMap::new();
+        for (key, _) in &FORMAT_DATA.deref().0 {
+            map.insert(key.code.into(), key);
+        }
+        map
+    };
 }
