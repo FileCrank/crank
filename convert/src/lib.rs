@@ -44,7 +44,9 @@ pub fn execute_path(
         dest_buf.set_position(0);
         src_inner = BufReader::new(dest_buf);
         src_buf = &mut src_inner;
-        dest_buf = Cursor::new(Vec::with_capacity(curr_capacity))
+        dest_buf = Cursor::new(Vec::with_capacity(curr_capacity));
+
+        curr_node = next;
     }
 
     // TODO: it would be great if this could be expressed more elegantly - if we were smart enough to skip the state management on the last iteration, we could just copy from dest

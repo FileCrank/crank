@@ -9,10 +9,10 @@ use convert::format::{Format, FORMATS_BY_CODE};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
-    #[arg(short, long)]
+    #[arg(required(true), index(1))]
     input: PathBuf,
 
-    #[arg(short, long)]
+    #[arg(required(true), index(2))]
     output: PathBuf
 }
 
