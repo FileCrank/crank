@@ -1,3 +1,4 @@
+pub mod csv;
 pub mod docx;
 pub mod identity;
 pub mod img;

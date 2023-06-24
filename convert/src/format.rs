@@ -1,3 +1,4 @@
+use crate::conversions::csv::csv_to_txt;
 use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
 use crate::conversions::md::md_to_txt;
@@ -85,6 +86,9 @@ macro_rules! conversion_format {
 pub const TXT: Format = conversion_format!("txt", "Text");
 pub const MD: Format = conversion_format!("md", "Markdown");
 pub const DOCX: Format = conversion_format!("docx", "Word Document");
+
+// Spreadsheet formats
+pub const CSV: Format = conversion_format!("csv", "CSV");
 
 // Image formats
 pub const JPG: Format = conversion_format!("jpg", "JPG Image");
@@ -187,6 +191,18 @@ pub fn build_graph() -> (
     for_all_pairs!(
         add_image_conversion,
         graph: jpg png gif webp pnm tiff tga dds bmp ico hdr
+    );
+
+    // Spreadsheet formats
+    let csv = add_node!(&CSV, graph, format_indices);
+
+    graph.add_edge(
+        csv,
+        txt,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: Box::new(csv_to_txt),
+        },
     );
 
     (format_indices, graph)

@@ -19,6 +19,8 @@ pub enum ConversionError {
     ZipError(#[from] zip::result::ZipError),
     #[error(transparent)]
     ImageError(#[from] image::ImageError),
+    #[error(transparent)]
+    CSVError(#[from] csv::Error),
 }
 
 impl Serialize for ConversionError {
