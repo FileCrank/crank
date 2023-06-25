@@ -1,7 +1,8 @@
 use crate::error::ConversionResult;
+use crate::format::Source;
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, ComrakOptions};
-use std::io::{BufRead, Write};
+use std::io::Write;
 
 macro_rules! parse_md {
     ($source: expr, $arena: expr) => {{
@@ -22,13 +23,13 @@ where
     Ok(())
 }
 
-pub fn parse_md_fn(source: &mut dyn BufRead) -> ConversionResult<()> {
+pub fn parse_md_fn(source: &mut dyn Source) -> ConversionResult<()> {
     let arena: Arena<AstNode> = Arena::new();
     parse_md!(source, arena);
     Ok(())
 }
 
-pub fn md_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+pub fn md_to_txt(source: &mut dyn Source, sink: &mut dyn Write) -> ConversionResult<()> {
     let arena = Arena::new();
     let root = parse_md!(source, arena);
     // TODO: figure out a way to use sink without the indirection

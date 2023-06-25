@@ -1,7 +1,8 @@
 use crate::error::ConversionResult;
-use std::io::{copy, BufRead, Write};
+use crate::format::Source;
+use std::io::{copy, Write};
 
-pub fn identity_conversion(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+pub fn identity_conversion(source: &mut dyn Source, sink: &mut dyn Write) -> ConversionResult<()> {
     copy(source, sink)?;
     Ok(())
 }

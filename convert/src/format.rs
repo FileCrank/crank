@@ -1,8 +1,9 @@
-use crate::conversions::csv::csv_to_txt;
+use crate::conversions::csv::{csv_to_txt, csv_to_xlsx};
 use crate::conversions::docx::docx_to_md;
 use crate::conversions::identity::identity_conversion;
 use crate::conversions::md::md_to_txt;
 use crate::conversions::txt::txt_to_docx;
+use crate::conversions::xlsx::xlsx_to_csv;
 use crate::error::ConversionResult;
 use crate::{for_all_pairs, image_to_image};
 use comrak::nodes::NodeValue::Image;
@@ -14,8 +15,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
-use std::io::{BufRead, Write};
+use std::io::{Read, Seek, Write};
 use std::sync::Arc;
+
+// TODO: should this require bufread? Upside is performance, downside is liming the types that this will work over. I should look in the STL to see whether there are any Read but not BufRead dealbreakers
+/// The trait for the source argument to conversion functions
+pub trait Source: Read + Seek {}
 
 pub type ChunkFn<'a, T> = dyn Fn(&'a T) -> ConversionResult<()>;
 
@@ -23,11 +28,11 @@ pub type ChunkFn<'a, T> = dyn Fn(&'a T) -> ConversionResult<()>;
 pub trait ConversionFormat {
     type ChunkType;
 
-    fn read(source: &mut dyn BufRead, recv: &ChunkFn<Self::ChunkType>) -> ConversionResult<()>;
+    fn read(source: &mut dyn Source, recv: &ChunkFn<Self::ChunkType>) -> ConversionResult<()>;
 }
 
 pub type ConversionFn =
-    dyn Fn(&mut dyn BufRead, &mut dyn Write) -> ConversionResult<()> + Send + Sync;
+    dyn Fn(&mut dyn Source, &mut dyn Write) -> ConversionResult<()> + Send + Sync;
 
 #[derive(Debug)]
 pub struct ConversionQuality {}
@@ -89,6 +94,7 @@ pub const DOCX: Format = conversion_format!("docx", "Word Document");
 
 // Spreadsheet formats
 pub const CSV: Format = conversion_format!("csv", "CSV");
+pub const XLSX: Format = conversion_format!("xlsx", "XLSX");
 
 // Image formats
 pub const JPG: Format = conversion_format!("jpg", "JPG Image");
@@ -195,6 +201,7 @@ pub fn build_graph() -> (
 
     // Spreadsheet formats
     let csv = add_node!(&CSV, graph, format_indices);
+    let xlsx = add_node!(&XLSX, graph, format_indices);
 
     graph.add_edge(
         csv,
@@ -202,6 +209,24 @@ pub fn build_graph() -> (
         Conversion {
             quality: ConversionQuality {},
             executor: Box::new(csv_to_txt),
+        },
+    );
+
+    graph.add_edge(
+        xlsx,
+        csv,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: Box::new(xlsx_to_csv),
+        },
+    );
+
+    graph.add_edge(
+        csv,
+        xlsx,
+        Conversion {
+            quality: ConversionQuality {},
+            executor: Box::new(csv_to_xlsx),
         },
     );
 

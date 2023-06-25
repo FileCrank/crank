@@ -1,11 +1,11 @@
 use crate::error::ConversionResult;
-use crate::format::ConversionFn;
+use crate::format::{ConversionFn, Source};
 use image::io::Reader;
 use image::{ImageEncoder, ImageFormat, ImageOutputFormat};
-use std::io::{BufRead, Cursor, Read, Write};
+use std::io::{Cursor, Read, Write};
 
 pub fn image_to_image_inner(
-    source: &mut dyn BufRead,
+    source: &mut dyn Source,
     dest: &mut dyn Write,
     from: ImageFormat,
     to: ImageFormat,
@@ -25,7 +25,7 @@ pub fn image_to_image_inner(
 #[macro_export]
 macro_rules! image_to_image {
     ($from: expr, $to: expr) => {
-        Box::new(move |source: &mut dyn BufRead, dest: &mut dyn Write| {
+        Box::new(move |source: &mut Source, dest: &mut dyn Write| {
             crate::conversions::img::image_to_image_inner(source, dest, $from, $to)
         })
     };

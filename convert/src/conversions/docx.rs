@@ -1,7 +1,8 @@
 use crate::error::ConversionResult;
+use crate::format::Source;
 use crate::writers::md::{MarkdownStyingContext, MarkdownWriter};
 use docx_rs::{read_docx, DocumentChild, Paragraph, ParagraphChild, Run, RunChild, RunProperty};
-use std::io::{BufRead, Write};
+use std::io::Write;
 
 fn apply_run_property(ctx: &mut MarkdownStyingContext, property: &RunProperty) {
     if let Some(_) = property.bold {
@@ -108,7 +109,7 @@ fn document_child_to_md(
     Ok(())
 }
 
-pub fn docx_to_md(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+pub fn docx_to_md(source: &mut dyn Source, sink: &mut dyn Write) -> ConversionResult<()> {
     let mut buf: Vec<u8> = Vec::new();
     source.read_to_end(&mut buf)?;
 
@@ -165,7 +166,7 @@ fn document_child_to_txt(child: &DocumentChild, sink: &mut dyn Write) -> Convers
     Ok(())
 }
 
-pub fn docx_to_txt(source: &mut dyn BufRead, sink: &mut dyn Write) -> ConversionResult<()> {
+pub fn docx_to_txt(source: &mut dyn Source, sink: &mut dyn Write) -> ConversionResult<()> {
     let mut buf: Vec<u8> = Vec::new();
     source.read_to_end(&mut buf)?;
     let docx = read_docx(buf.as_slice())?;
