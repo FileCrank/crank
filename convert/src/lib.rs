@@ -9,8 +9,10 @@ use crate::format::{Conversion, Format, Source, FORMAT_DATA};
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
-use std::io::{copy, BufReader, Cursor, Write};
+use std::io::{copy, BufReader, Cursor, Read, Seek, Write};
 use std::ops::Deref;
+
+impl<T> Source for T where T: Read + Seek {}
 
 pub fn execute_path(
     graph: &Graph<&Format, Conversion>,
@@ -21,8 +23,8 @@ pub fn execute_path(
     let mut path_iter = path.iter();
     let mut curr_node = path_iter.next().ok_or(ConversionError::EmptyPathError)?;
 
-    let mut src_inner: BufReader<Cursor<Vec<u8>>>;
-    let mut src_buf: &mut Source = source;
+    let mut src_buf: &mut dyn Source = source;
+    let mut src_inner: Cursor<Vec<u8>>;
     let mut dest_buf: Cursor<Vec<u8>> = Cursor::new(Vec::new());
 
     // TODO: ideally we wouldn't have to do this in memory, and would be smart about the one-hop case where we don't need an extra copy
@@ -42,7 +44,8 @@ pub fn execute_path(
         // capacity of the old one is a good starting point
         let curr_capacity = dest_buf.get_ref().capacity();
         dest_buf.set_position(0);
-        src_inner = BufReader::new(dest_buf);
+        // TODO: we should be able to get rid of src_inner here
+        src_inner = dest_buf.clone();
         src_buf = &mut src_inner;
         dest_buf = Cursor::new(Vec::with_capacity(curr_capacity));
 

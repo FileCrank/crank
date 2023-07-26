@@ -21,6 +21,8 @@ pub enum ConversionError {
     ImageError(#[from] image::ImageError),
     #[error(transparent)]
     CSVError(#[from] csv::Error),
+    #[error(transparent)]
+    XLSXError(#[from] calamine::XlsxError),
 }
 
 impl Serialize for ConversionError {

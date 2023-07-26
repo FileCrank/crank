@@ -25,7 +25,7 @@ pub fn image_to_image_inner(
 #[macro_export]
 macro_rules! image_to_image {
     ($from: expr, $to: expr) => {
-        Box::new(move |source: &mut Source, dest: &mut dyn Write| {
+        Box::new(move |source: &mut dyn Source, dest: &mut dyn Write| {
             crate::conversions::img::image_to_image_inner(source, dest, $from, $to)
         })
     };

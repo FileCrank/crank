@@ -16,6 +16,6 @@ pub fn csv_to_txt(source: &mut dyn Source, dest: &mut dyn Write) -> ConversionRe
     Ok(())
 }
 
-pub fn csv_to_xlsx(source: &mut dyn BufRead, dest: &mut dyn Write) -> ConversionResult<()> {
+pub fn csv_to_xlsx(source: &mut dyn Source, dest: &mut dyn Write) -> ConversionResult<()> {
     todo!();
 }

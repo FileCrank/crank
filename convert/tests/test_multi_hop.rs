@@ -1,12 +1,12 @@
 use convert::convert;
 use convert::format::{Format, CSV, DOCX};
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, Cursor};
 use std::str;
 
 #[test]
 fn test_csv_to_docx() {
-    let mut basic = BufReader::new(File::open("tests/test_files/basic.csv").unwrap());
+    let mut basic = File::open("tests/test_files/basic.csv").unwrap();
     let mut dest: Vec<u8> = Vec::new();
 
     convert(&CSV, &DOCX, &mut basic, &mut dest).unwrap();
