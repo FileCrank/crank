@@ -1,9 +1,8 @@
-use std::arch::x86_64::_mm256_zeroupper;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{PathBuf};
 use clap::Parser;
-use convert::{convert, format::{JPG, PNG}};
+use convert::{convert};
 use convert::format::{Format, FORMATS_BY_CODE};
 
 #[derive(Parser, Debug)]
